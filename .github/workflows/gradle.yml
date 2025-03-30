@@ -47,11 +47,12 @@ jobs:
         run: ./gradlew jacocoTestReport
         
       - name: Download previous badges
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
+        continue-on-error: true
         with:
           name: jacoco-badge-data
           path: .github/badges
-        continue-on-error: true
+          if-no-files-found: warn
       
       - name: Generate JaCoCo Badge
         id: jacoco
@@ -66,7 +67,7 @@ jobs:
           generate-summary: true
           
       - name: Upload JaCoCo badges
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: jacoco-badge-data
           path: .github/badges
