@@ -7,12 +7,7 @@ on:
     branches: [ "master" ]
 
 permissions:
-  contents: read
-  checks: write
-  pull-requests: write
-  actions: read
-  issues: read
-  statuses: write
+  contents: write
 
 jobs:
   build_and_test:
@@ -46,40 +41,16 @@ jobs:
       - name: Run Test Coverage
         run: ./gradlew jacocoTestReport
         
-      - name: Download previous badges
-        uses: actions/download-artifact@v3
-        continue-on-error: true
-        with:
-          name: jacoco-badge-data
-          path: .github/badges
-          if-no-files-found: warn
-      
       - name: Generate JaCoCo Badge
         id: jacoco
         uses: cicirello/jacoco-badge-generator@v2.9.0
         with:
           jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
-          badges-directory: .github/badges
           fail-on-coverage-decrease: true
           fail-on-branches-decrease: true
           generate-coverage-badge: true
           generate-branches-badge: true
           generate-summary: true
-          
-      - name: Upload JaCoCo badges
-        uses: actions/upload-artifact@v3
-        with:
-          name: jacoco-badge-data
-          path: .github/badges
-          
-      # Print out coverage info for debugging
-      - name: Output Coverage Info
-        run: |
-          echo "Coverage: ${{ steps.jacoco.outputs.coverage }}"
-          echo "Previous Coverage: ${{ steps.jacoco.outputs.coverage-percent-previous }}"
-          echo "Branch Coverage: ${{ steps.jacoco.outputs.branches }}"
-          echo "Previous Branch Coverage: ${{ steps.jacoco.outputs.branches-percent-previous }}"
-          cat .github/badges/jacoco.json || echo "No coverage JSON found"
 
   build_and_publish_docker_image:
     name: Publish to Docker Hub
