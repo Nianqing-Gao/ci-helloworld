@@ -6,8 +6,8 @@ on:
   pull_request:
     branches: [ "master" ]
 
-  # permissions:
-  # contents: read
+permissions:
+  contents: read
 
 jobs:
   build_and_test:
@@ -37,8 +37,20 @@ jobs:
         uses: cicirello/jacoco-badge-generator@v2.9.0
         with:
           jacoco-csv-file: build/reports/jacoco/test/jacocoTestReport.csv
-          fail-on-coverage-decrease: true
+          generate-summary: true
+          summary-filename: "jacoco-summary.json"
           fail-on-branches-decrease: true
+          fail-on-coverage-decrease: true
+      - name: Save Jacoco Summary
+        run: |
+          if [[ $(git status .github/badges --porcelain) ]]; then
+            git config --global user.name 'Nianqing-Gao'
+            git config --global user.email 'ngao6@jhu.edu'
+            git add '.github/badges'
+            git commit -m "JaCoCo Summary"
+            git push
+          fi
+
 
   build_and_publish_docker_image:
     name: Publish to Docker Hub
